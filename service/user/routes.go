@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/emirrcaglar/go-restapi/config"
 	"github.com/emirrcaglar/go-restapi/service/auth"
 	"github.com/emirrcaglar/go-restapi/types"
 	"github.com/emirrcaglar/go-restapi/utils"
@@ -49,11 +50,17 @@ func (h *Handler) handleLogin(w http.ResponseWriter, r *http.Request) {
 	// compare passwords
 	matched := auth.ComparePasswords(u.Password, []byte(payload.Password))
 	// login if match
-	if matched {
-		utils.WriteJSON(w, http.StatusOK, "successfully logged in.")
+	if !matched {
+		utils.WriteJSON(w, http.StatusBadRequest, "invalid email or password.")
 		return
 	}
-	utils.WriteJSON(w, http.StatusBadRequest, "invalid email or password.")
+	secret := []byte(config.Envs.JWTSecret)
+	token, err := auth.CreateJWT([]byte(secret), u.ID)
+	if err != nil {
+		utils.WriteError(w, http.StatusInternalServerError, err)
+	}
+
+	utils.WriteJSON(w, http.StatusOK, map[string]string{"token": token})
 }
 
 func (h *Handler) handleRegister(w http.ResponseWriter, r *http.Request) {
