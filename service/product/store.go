@@ -55,6 +55,7 @@ func scanRowsIntoProduct(rows *sql.Rows) (*types.Product, error) {
 		&product.ID,
 		&product.Name,
 		&product.Description,
+		&product.Image,
 		&product.Price,
 		&product.Quantity,
 		&product.CreatedAt,
