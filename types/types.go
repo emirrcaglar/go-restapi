@@ -10,6 +10,8 @@ type UserStore interface {
 
 type ProductStore interface {
 	GetProducts() ([]Product, error)
+	ProductExists(Product) bool
+	CreateProduct(Product) error
 }
 
 type Product struct {
